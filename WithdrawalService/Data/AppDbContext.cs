@@ -16,6 +16,8 @@ namespace WithdrawalService.Data
         }
 
         public DbSet<Withdrawal> Withdrawals { get; set; }
+        public DbSet<Bank> Banks { get; set; }
+        public DbSet<AppUser> AspNetUsers { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

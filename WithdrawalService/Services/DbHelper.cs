@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace WithdrawalService.Services
             return optionsBuilder.Options;
         }
 
-        public List<Withdrawal> GetWitdrawals()
+        public  List<Withdrawal> GetWitdrawals()
         {
             using (_dbContext = new AppDbContext(GetAllOptions()))
             {
@@ -39,6 +40,25 @@ namespace WithdrawalService.Services
                 {
                     throw;
                 }
+            }
+        }
+
+        public async Task<List<Bank>> GetAllBanksAsync()
+        {
+            using (_dbContext = new AppDbContext(GetAllOptions()))
+            {
+                var banks = await _dbContext.Banks.ToListAsync();
+                return banks;
+            }
+
+        }
+
+        public async Task<Bank> GetBankSortCodeAsync(string Bank)
+        {
+            using (_dbContext = new AppDbContext(GetAllOptions()))
+            {
+                var bank = await _dbContext.Banks.Where(x => x.BankName == Bank).SingleOrDefaultAsync();
+                return bank;
             }
         }
     }
