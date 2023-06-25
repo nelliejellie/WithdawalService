@@ -17,7 +17,8 @@ IHost host = Host.CreateDefaultBuilder(args)
         optionsBuilder.UseNpgsql(AppSettings.ConnectionString);
 
         services.AddScoped<AppDbContext>(db => new AppDbContext(optionsBuilder.Options));
-        
+        services.Configure<Paystack>(configuration.GetSection("Paystack"));
+
         services.AddHostedService<Worker>();
     })
     .UseSerilog((hostingContext, services, loggerConfiguration) => loggerConfiguration

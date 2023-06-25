@@ -3,6 +3,7 @@ using WithdrawalService.Data;
 using WithdrawalService.Domain;
 using System.Linq;
 using WithdrawalService.Services;
+using Microsoft.Extensions.Options;
 
 namespace WithdrawalService
 {
@@ -12,13 +13,15 @@ namespace WithdrawalService
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly BankHelper _bankHelper;
         private readonly UserHelper _userHelper;
+        private readonly Paystack _paystack;
 
-        public Worker(ILogger<Worker> logger, IServiceScopeFactory serviceScopeFactory)
+        public Worker(ILogger<Worker> logger, IServiceScopeFactory serviceScopeFactory, IOptions<Paystack> options)
         {
             _logger = logger;
             _serviceScopeFactory = serviceScopeFactory;
             _bankHelper = new BankHelper(serviceScopeFactory);
             _userHelper = new UserHelper(serviceScopeFactory);
+            _paystack = options.Value;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
