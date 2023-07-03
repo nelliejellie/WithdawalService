@@ -3,6 +3,7 @@ using Serilog;
 using WithdrawalService;
 using WithdrawalService.Data;
 using WithdrawalService.Domain;
+using WithdrawalService.Services;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>
@@ -18,7 +19,8 @@ IHost host = Host.CreateDefaultBuilder(args)
 
         services.AddScoped<AppDbContext>(db => new AppDbContext(optionsBuilder.Options));
         services.Configure<Paystack>(configuration.GetSection("Paystack"));
-
+        services.AddSingleton<BankHelper>();
+        services.AddSingleton<UserHelper>();
         services.AddHostedService<Worker>();
     })
     .UseSerilog((hostingContext, services, loggerConfiguration) => loggerConfiguration

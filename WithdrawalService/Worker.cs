@@ -10,17 +10,15 @@ namespace WithdrawalService
     public class Worker : BackgroundService
     {
         private readonly ILogger<Worker> _logger;
-        private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly BankHelper _bankHelper;
         private readonly UserHelper _userHelper;
         private readonly Paystack _paystack;
 
-        public Worker(ILogger<Worker> logger, IServiceScopeFactory serviceScopeFactory, IOptions<Paystack> options)
+        public Worker(ILogger<Worker> logger,UserHelper userHelper, IOptions<Paystack> options, BankHelper bankHelper)
         {
             _logger = logger;
-            _serviceScopeFactory = serviceScopeFactory;
-            _bankHelper = new BankHelper(serviceScopeFactory);
-            _userHelper = new UserHelper(serviceScopeFactory);
+            _bankHelper = bankHelper;
+            _userHelper = userHelper;
             _paystack = options.Value;
         }
 
