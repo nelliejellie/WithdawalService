@@ -45,8 +45,13 @@ namespace WithdrawalService
                         _logger.LogInformation($"this is the id {w.Id} and this is the amount {w.Amount} with status {w.Status}");
                         var userTask = _userHelper.GetUsersByAppUserId(w.AppUserId);
                         var user = await userTask;
-                        await _paystackHelper.CreateRecipient(_paystack,banks,user);
+                        var recipientCreator = await _paystackHelper.CreateRecipient(_paystack,banks,user);
                         _logger.LogInformation($"a successful recipient has been created for {user.FullName} with account number {user.BankAccountNumber}");
+                        if (recipientCreator.Length > 5)
+                        {
+                            await _paystackHelper.InitiateTransfer(_paystack, banks, w, user, recipientCreator);
+                        }
+                        
 
                     });
                     await Task.Delay(3600000, stoppingToken);

@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using WithdrawalService.Domain;
 using WithdrawalService.Entities;
 using System.Text.Json;
+using Microsoft.AspNetCore.Http;
+using System.Net;
 
 namespace WithdrawalService.Services
 {
@@ -18,7 +20,7 @@ namespace WithdrawalService.Services
         {
             _recipientHelper = recipientHelper;
         }
-        public async Task CreateRecipient(Paystack _paystack, List<Bank> banks, AppUser user)
+        public async Task<string> CreateRecipient(Paystack _paystack, List<Bank> banks, AppUser user)
         {
             try
             {
@@ -54,7 +56,7 @@ namespace WithdrawalService.Services
                         Active = responseObject.data.active
                     };
                     var createR = await _recipientHelper.CreateRecipient(newRecipient);
-                    await Console.Out.WriteLineAsync("recipient created");
+                    return newRecipient.RecipientCode;
                 }
                 else
                 {
@@ -68,9 +70,37 @@ namespace WithdrawalService.Services
             }
        }
 
-        public static async Task InitiateTransfer()
+        public async Task InitiateTransfer(Paystack _paystack, List<Bank> banks, Withdrawal withdrawal, AppUser user, string reciepientVal)
         {
+            try
+            {
+                var client = new HttpClient();
+                Bank userBank = banks.Where(u => u.BankName == user.BankName).SingleOrDefault();
+                string sortCode = $"0{userBank.SortCode}";
+                var request = new HttpRequestMessage(HttpMethod.Post, "https://api.paystack.co/transfer");
+                request.Headers.Add("Authorization", _paystack.TestSecret);
 
+                var requestContent = new RequestTransfer
+                {
+                    source = "balance",
+                    amount = withdrawal.Amount.ToString(),
+                    bank_code = sortCode,
+                    reciepient = reciepientVal
+                };
+                var content = JsonSerializer.Serialize(requestContent);
+                request.Content = new StringContent(content);
+                var response = await client.SendAsync(request);
+
+                if (response.StatusCode == HttpStatusCode.BadRequest)
+                {
+                    await Console.Out.WriteLineAsync("You cannot initiate third party payouts as a starter business");
+                }
+            } 
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
     }
 }

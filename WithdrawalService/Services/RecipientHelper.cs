@@ -13,9 +13,12 @@ namespace WithdrawalService.Services
     public class RecipientHelper
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        public RecipientHelper(IServiceScopeFactory serviceScopeFactory)
+        private readonly ILogger<RecipientHelper> _logger;
+        public RecipientHelper(IServiceScopeFactory serviceScopeFactory , ILogger<RecipientHelper> logger)
         {
             _serviceScopeFactory = serviceScopeFactory;
+            _logger = logger;
+
         }
 
         public async Task<bool> CreateRecipient(Recipient recipient)
@@ -32,9 +35,9 @@ namespace WithdrawalService.Services
                     return isAdded > 0;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                
+                _logger.LogError(ex.Message);
                 throw;
             }
         }
@@ -53,9 +56,9 @@ namespace WithdrawalService.Services
                     return isAdded > 0;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                _logger.LogError(ex.Message);
                 throw;
             }
         }
@@ -72,9 +75,9 @@ namespace WithdrawalService.Services
                     return thatRecipient;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                _logger.LogError(ex.Message);
                 throw;
             }
         }
