@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WithdrawalService.Domain;
+using WithdrawalService.Entities;
 
 namespace WithdrawalService.Data
 {
@@ -18,6 +19,8 @@ namespace WithdrawalService.Data
         public DbSet<Withdrawal> Withdrawals { get; set; }
         public DbSet<Bank> Banks { get; set; }
         public DbSet<AppUser> AspNetUsers { get; set; }
+        public DbSet<Recipient> Recipients { get; set; }
+        public DbSet<SuccessfulTransfers> SuccessfulTransfers { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

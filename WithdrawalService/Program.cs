@@ -21,6 +21,8 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.Configure<Paystack>(configuration.GetSection("Paystack"));
         services.AddSingleton<BankHelper>();
         services.AddSingleton<UserHelper>();
+        services.AddSingleton<PaystackHelper>();
+        services.AddSingleton<RecipientHelper>();
         services.AddHostedService<Worker>();
     })
     .UseSerilog((hostingContext, services, loggerConfiguration) => loggerConfiguration

@@ -1,25 +1,24 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WithdrawalService.Data;
-using WithdrawalService.Domain;
+using WithdrawalService.Entities;
+using WithdrawalService.Migrations;
 
 namespace WithdrawalService.Services
 {
-    public class BankHelper
+    public class RecipientHelper
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        public BankHelper(IServiceScopeFactory serviceScopeFactory)
+        public RecipientHelper(IServiceScopeFactory serviceScopeFactory)
         {
             _serviceScopeFactory = serviceScopeFactory;
         }
 
-
-        public async Task<List<Withdrawal>> GetAllWithdrawalAsync()
+        public async Task<bool> CreateRecipient(Recipient recipient)
         {
             try
             {
@@ -27,57 +26,56 @@ namespace WithdrawalService.Services
                 {
                     var _dbContext = scope.ServiceProvider.GetService<AppDbContext>();
 
-                    var wits = await _dbContext.Withdrawals.ToListAsync();
-                    return wits;
+                    var newRecipientTask = await  _dbContext.Recipients.AddAsync(recipient);
+                    var isAdded =  await _dbContext.SaveChangesAsync();
+
+                    return isAdded > 0;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-
-                throw ex;
-            }
-            
-
-        }
-
-        public async Task<List<Bank>> GetAllBanksAsync()
-        {
-            try
-            {
-                using (var scope = _serviceScopeFactory.CreateScope())
-                {
-                    var _dbContext = scope.ServiceProvider.GetService<AppDbContext>();
-
-                    var banks = await _dbContext.Banks.ToListAsync();
-                    return banks;
-                }
-            }
-            catch (Exception ex)
-            {
-
-                throw ex;
-            }
-            
                 
+                throw;
+            }
         }
 
-        public async Task<string> GetBankSortCodeAsync(string Bank)
+        public async Task<bool> DeleteRecipient(Recipient recipient)
         {
-           
             try
             {
                 using (var scope = _serviceScopeFactory.CreateScope())
                 {
                     var _dbContext = scope.ServiceProvider.GetService<AppDbContext>();
 
-                    var bank = await _dbContext.Banks.Where(x => x.BankName == Bank).SingleOrDefaultAsync();
-                    return $"0{bank.SortCode}";
+                    var unwantedRecipientTask = _dbContext.Recipients.Remove(recipient);
+                    var isAdded = await _dbContext.SaveChangesAsync();
+
+                    return isAdded > 0;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
-                throw ex;
+                throw;
+            }
+        }
+
+        public async Task<Recipient> GetRecipientByCode(string code)
+        {
+            try
+            {
+                using (var scope = _serviceScopeFactory.CreateScope())
+                {
+                    var _dbContext = scope.ServiceProvider.GetService<AppDbContext>();
+
+                    var thatRecipient = await _dbContext.Recipients.Where(r => r.RecipientCode == code).SingleOrDefaultAsync();
+                    return thatRecipient;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
             }
         }
     }
